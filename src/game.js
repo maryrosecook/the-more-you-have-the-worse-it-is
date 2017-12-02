@@ -128,7 +128,7 @@ class Board {
 
   draw (screen) {
     if (this.focused) {
-      screen.fillStyle = "#eee";
+      screen.fillStyle = "#ddd";
     } else {
       screen.fillStyle = "#fff";
     }
@@ -137,6 +137,12 @@ class Board {
                     this.center.y - this.size.y / 2,
                     this.size.x,
                     this.size.y);
+
+    screen.strokeStyle = "#eee";
+    screen.strokeRect(this.center.x - this.size.x / 2,
+                      this.center.y - this.size.y / 2,
+                      this.size.x,
+                      this.size.y);
   }
 
   top() {
