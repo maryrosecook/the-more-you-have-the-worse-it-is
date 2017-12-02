@@ -4,7 +4,6 @@ add dividing lines
 normalise starting vector
 get all grid lines on screen
 fix bug with tap to click
-
 stop focus when mouse outside game
 add token (yellow)
 add board with each token

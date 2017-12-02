@@ -361,7 +361,7 @@
     connectReceiverToKeyboard(keyboardReceiver, window, autoFocus);
 
     this._buttonListener = new ButtonListener(canvas, keyboardReceiver);
-    this._mouseMoveListener = new MouseMoveListener(canvas);
+    this._mouseMoveListener = new MouseMoveListener(keyboardReceiver);
   };
 
   Inputter.prototype = {
@@ -613,14 +613,18 @@
   };
 
   var getElementPosition = function(element) {
-    var rect = element.getBoundingClientRect();
-    var document = element.ownerDocument;
-    var body = document.body;
-    var window = getWindow(document);
-    return {
-      x: rect.left + (window.pageXOffset || body.scrollLeft) - (body.clientLeft || 0),
-      y: rect.top + (window.pageYOffset || body.scrollTop) - (body.clientTop || 0)
-    };
+    if (element.ownerDocument === undefined) {
+      return { x: 0, y: 0 };
+    } else {
+      var rect = element.getBoundingClientRect();
+      var document = element.ownerDocument;
+      var body = document.body;
+      var window = getWindow(document);
+      return {
+        x: rect.left + (window.pageXOffset || body.scrollLeft) - (body.clientLeft || 0),
+        y: rect.top + (window.pageYOffset || body.scrollTop) - (body.clientTop || 0)
+      };
+    }
   };
 
   var connectReceiverToKeyboard = function(keyboardReceiver, window, autoFocus) {
