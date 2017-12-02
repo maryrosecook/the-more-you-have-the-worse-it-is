@@ -9,11 +9,9 @@ class Game {
 
   _addBoard(index) {
     const BOARD_COUNT = { x: 3, y: 3 };
-    const WORLD_SIZE = this.c.renderer.getViewSize();
     let board = this.c.entities.create(Board, {
       index: index,
-      boardCount: BOARD_COUNT,
-      worldSize: WORLD_SIZE
+      boardCount: BOARD_COUNT
     });
   }
 };
@@ -104,8 +102,7 @@ class Board {
     this.size = { x: 200, y: 200 };
     this.center = this._generateCenter(
       options.index,
-      options.boardCount,
-      options.worldSize);
+      options.boardCount);
     this.focused = false;
     this.zindex = -1;
 
@@ -162,7 +159,7 @@ class Board {
                            this.game.c.collider.RECTANGLE);
   }
 
-  _generateCenter(index, boardCount, worldSize) {
+  _generateCenter(index, boardCount) {
     let x = (index % boardCount.x) * this.size.x + this.size.x / 2;
     let y = Math.floor(index / boardCount.y) * this.size.y + this.size.y / 2;
     return { x, y };
