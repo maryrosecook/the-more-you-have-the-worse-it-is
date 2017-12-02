@@ -1,0 +1,14 @@
+add extra space into center calc
+line up space with border lines
+add dividing lines
+normalise starting vector
+
+fix bug with tap to click
+stop focus when mouse outside game
+add token (yellow)
+add board with each token
+add token respawning
+add spike (red)
+add death on hit spike
+pull players out of walls fully on collision
+change to split rather than grid
