@@ -2,6 +2,7 @@ add extra space into center calc
 line up space with border lines
 add dividing lines
 normalise starting vector
+get all grid lines on screen
 
 fix bug with tap to click
 stop focus when mouse outside game
