@@ -131,7 +131,7 @@ class Board {
 
   draw (screen) {
     if (this.focused) {
-      screen.fillStyle = "#ddd";
+      screen.fillStyle = "#eee";
     } else {
       screen.fillStyle = "#fff";
     }
@@ -141,7 +141,7 @@ class Board {
                     this.size.x,
                     this.size.y);
 
-    screen.strokeStyle = "#eee";
+    screen.strokeStyle = "#000";
     screen.strokeRect(this.center.x - this.size.x / 2,
                       this.center.y - this.size.y / 2,
                       this.size.x,
