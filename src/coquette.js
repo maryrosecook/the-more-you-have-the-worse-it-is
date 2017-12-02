@@ -587,9 +587,9 @@
     },
 
     _getAbsoluteMousePosition: function(e) {
-	    if (e.pageX) 	{
+	    if (e.pageX !== undefined) 	{
         return { x: e.pageX, y: e.pageY };
-	    } else if (e.clientX) {
+	    } else if (e.clientX !== undefined) {
         return { x: e.clientX, y: e.clientY };
       }
     }
