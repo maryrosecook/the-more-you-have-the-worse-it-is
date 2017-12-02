@@ -33,7 +33,7 @@ var DrawableAsCircle = Base => class extends Base {
   }
 };
 
-class Player extends DrawableAsCircle(Base) {
+class Collector extends DrawableAsCircle(Base) {
   constructor (game, options) {
     super();
     this.game = game;
@@ -109,7 +109,7 @@ class Board {
     this.focused = false;
     this.zindex = -1;
 
-    this.game.c.entities.create(Player, {
+    this.game.c.entities.create(Collector, {
       board: this
     });
   }
