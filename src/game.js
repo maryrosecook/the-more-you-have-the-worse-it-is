@@ -166,8 +166,13 @@ class Board {
   }
 
   _generateCenter(index, boardCount) {
-    let x = (index % boardCount.x) * this.size.x + this.size.x / 2;
-    let y = Math.floor(index / boardCount.y) * this.size.y + this.size.y / 2;
+    var space = 1;
+    let x = index % boardCount.x *
+        (this.size.x + space) +
+        this.size.x / 2;
+    let y = Math.floor(index / boardCount.y) *
+        (this.size.y + space) +
+        this.size.y / 2;
     return { x, y };
   }
 };
