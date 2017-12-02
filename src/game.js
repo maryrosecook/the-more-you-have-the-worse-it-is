@@ -128,7 +128,7 @@ class Board {
 
   draw (screen) {
     if (this.focused) {
-      screen.fillStyle = "#ff0";
+      screen.fillStyle = "#eee";
     } else {
       screen.fillStyle = "#fff";
     }
