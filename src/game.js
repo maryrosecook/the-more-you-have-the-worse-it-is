@@ -41,7 +41,10 @@ class Player extends DrawableAsCircle(Base) {
     this.boundingBox = this.game.c.collider.CIRCLE;
     this.center = mathLib.copyPoint(options.board.center);
     this.size = { x: 7, y: 7 };
-    this.direction = { x: 1, y: 0 };
+    this.direction = mathLib.unitVector({
+      x: Math.random() - 0.5,
+      y: Math.random() - 0.5
+    });
     this.color = "#000";
     this.zindex = 1;
   }
