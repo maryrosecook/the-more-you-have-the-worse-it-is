@@ -41,7 +41,7 @@ class Player extends DrawableAsCircle(Base) {
     this.boundingBox = this.game.c.collider.CIRCLE;
     this.center = mathLib.copyPoint(options.board.center);
     this.size = { x: 7, y: 7 };
-    this.direction = mathLib.unitVector({
+    this.vector = mathLib.unitVector({
       x: Math.random() - 0.5,
       y: Math.random() - 0.5
     });
@@ -50,40 +50,40 @@ class Player extends DrawableAsCircle(Base) {
   }
 
   update () {
-    this._maybeUpdateDirection();
+    this._maybeUpdateVector();
     this._move();
     this._maybeBounceOffWalls();
   }
 
   _move() {
-    this.center.x += this.direction.x;
-    this.center.y += this.direction.y;
+    this.center.x += this.vector.x;
+    this.center.y += this.vector.y;
   }
 
   _maybeBounceOffWalls() {
     var collider = this.game.c.collider;
     if (collider.isIntersecting(this, this.board.top()) ||
         collider.isIntersecting(this, this.board.bottom())) {
-      this.direction.y = -this.direction.y;
+      this.vector.y = -this.vector.y;
     }
 
     if (collider.isIntersecting(this, this.board.left()) ||
         collider.isIntersecting(this, this.board.right())) {
-      this.direction.x = -this.direction.x;
+      this.vector.x = -this.vector.x;
     }
   }
 
-  _maybeUpdateDirection () {
+  _maybeUpdateVector () {
     if (!this.board.focused) { return; }
 
     let inputter = this.game.c.inputter;
     if (inputter.isDown(inputter.LEFT_MOUSE)) {
-      this.direction = this._newDirection(
+      this.vector = this._newVector(
         inputter.getMousePosition());
     }
   }
 
-  _newDirection (target) {
+  _newVector (target) {
     return mathLib.unitVector(
       mathLib.vectorBetween(this.center, target));
   }
