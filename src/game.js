@@ -8,6 +8,7 @@ class Game {
                           "#fff");
     this.zindex = 2;
     this.isOver = false;
+    this.isShowingInstructions = true;
     this._addBoard({ x: windowSize.x - 2, y: windowSize.y - 2 });
   };
 
@@ -18,10 +19,10 @@ class Game {
   }
 
   draw (screen) {
-    if (!this.isOver) {
-      this._drawInstructions(screen);
-    } else {
+    if (this.isOver) {
       this._drawGameOver(screen);
+    } else if (this.isShowingInstructions) {
+      this._drawInstructions(screen);
     }
   }
 
@@ -48,16 +49,21 @@ class Game {
     screen.font = "14px Courier";
     screen.fillStyle = "#000";
     screen.textAlign = "left";
-    screen.fillText("Click to direct black dot", 8, 20);
-    screen.fillText("Collect yellow dots to speed up point scoring", 8, 35);
-    screen.fillText("Avoid red dots", 8, 50);
+    screen.fillText("CLICK TO DIRECT BLACK DOT", 8, 20);
+    screen.fillText("COLLECT YELLOW DOTS TO SCORE POINTS FASTER", 8, 35);
+    screen.fillText("AVOID RED DOTS", 8, 50);
 
+  }
+
+  _hideInstructions () {
+    this.isShowingInstructions = false;
   }
 
   _addBoard(size) {
     let board = this.c.entities.create(Board, {
       size: size,
-      center: { x: size.x / 2 + 1, y: size.y / 2 + 1 }
+      center: { x: size.x / 2 + 1, y: size.y / 2 + 1 },
+      onSplit: this._hideInstructions.bind(this)
     });
   }
 
@@ -172,6 +178,7 @@ class Board {
     this.game = game;
     this.size = options.size;
     this.center = options.center;
+    this.onSplit = options.onSplit;
     this.focused = false;
     this.zindex = -1;
 
@@ -204,7 +211,14 @@ class Board {
 
   split () {
     new SplitBoards(this.game, this);
+    this._reportSplit();
     this.destroy();
+  }
+
+  _reportSplit () {
+    if (this.onSplit !== undefined) {
+      this.onSplit();
+    }
   }
 
   destroy () {
