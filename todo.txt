@@ -10,9 +10,9 @@ remove token when collector hits it
 add token (yellow)
 add board with each token
 add token respawning
-
 add spike (red)
 add death on hit spike
-pull players out of walls fully on collision
+
 change to split rather than grid
+pull players out of walls fully on collision
 stop overlap
