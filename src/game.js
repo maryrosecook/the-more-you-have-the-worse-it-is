@@ -32,13 +32,13 @@ class Game {
   }
 
   _drawGameOver (screen) {
-    var viewSize = this.c.renderer.getViewSize();
+    var windowSize = this._windowSize();
     screen.font = "30px Courier";
     screen.fillStyle = "#f33";
     screen.textAlign = "center";
     screen.fillText("GAME OVER",
-                    viewSize.x / 2,
-                    viewSize.y / 2 + 9);
+                    windowSize.x / 2,
+                    windowSize.y / 2 + 9);
   }
 
   _addBoard(size) {
