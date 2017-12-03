@@ -1,11 +1,14 @@
 class Game {
-  constructor (canvasId, width, height) {
-    this.c = new Coquette(this, canvasId, width, height, "#fff");
+  constructor (canvasId) {
+    let windowSize = this._windowSize();
+    this.c = new Coquette(this,
+                          canvasId,
+                          windowSize.x,
+                          windowSize.y,
+                          "#fff");
     this.zindex = 2;
-
     this.isOver = false;
-    this.boardCount = 0;
-    this._addBoard();
+    this._addBoard({ x: windowSize.x - 2, y: windowSize.y - 2 });
   };
 
   update () {
@@ -35,21 +38,19 @@ class Game {
     screen.textAlign = "center";
     screen.fillText("GAME OVER",
                     viewSize.x / 2,
-                    viewSize.y / 2);
+                    viewSize.y / 2 + 9);
   }
 
-  _addBoard() {
+  _addBoard(size) {
     const BOARD_COUNT = { x: 3, y: 3 };
     let board = this.c.entities.create(Board, {
-      index: this.boardCount,
-      boardCount: BOARD_COUNT
+      size: size,
+      center: { x: size.x / 2 + 1, y: size.y / 2 + 1 }
     });
-
-    this.boardCount++;
   }
 
-  tokenCollected (board) {
-    this._addBoard();
+  _windowSize () {
+    return { x: window.innerWidth, y: window.innerHeight };
   }
 
   over () {
@@ -80,9 +81,10 @@ class Collector extends DrawableAsCircle(Base) {
     this.game = game;
     this.board = options.board;
     this.boundingBox = this.game.c.collider.CIRCLE;
-    this.center = mathLib.copyPoint(options.board.center);
+    this.center = options.center ||
+      mathLib.copyPoint(options.board.center);
     this.size = { x: 7, y: 7 };
-    this.vector = mathLib.unitVector({
+    this.vector = options.vector || mathLib.unitVector({
       x: Math.random() - 0.5,
       y: Math.random() - 0.5
     });
@@ -156,16 +158,15 @@ class Spike extends DrawableAsCircle(Base) {
 class Board {
   constructor (game, options) {
     this.game = game;
-    this.size = { x: 200, y: 200 };
-    this.center = this._generateCenter(
-      options.index,
-      options.boardCount);
+    this.size = options.size;
+    this.center = options.center;
     this.focused = false;
     this.zindex = -1;
 
-    this._spawnCollector();
+    this._spawnCollector(options.collectorCenter,
+                         options.collectorVector);
     this._spawnToken();
-    this._spawnSpikes();
+    this._spawnSpike(options.spikeCenter);
   }
 
   update () {
@@ -174,28 +175,38 @@ class Board {
     this._maybeCollectorHitsSpike();
   }
 
-  _spawnCollector () {
+  _spawnCollector (center, vector) {
     this.collector = this.game.c.entities.create(Collector, {
-      board: this
+      board: this,
+      center: center,
+      vector: vector
     });
   }
 
   _maybeCollectToken () {
     var collider = this.game.c.collider;
     if (collider.isIntersecting(this.token, this.collector)) {
-      this.game.tokenCollected(this);
-      this.game.c.entities.destroy(this.token);
-      this._spawnToken();
+      this.split();
     }
+  }
+
+  split () {
+    new SplitBoards(this.game, this);
+    this.destroy();
+  }
+
+  destroy () {
+    this.game.c.entities.destroy(this.collector);
+    this.game.c.entities.destroy(this.token);
+    this.game.c.entities.destroy(this.spike);
+    this.game.c.entities.destroy(this);
   }
 
   _maybeCollectorHitsSpike () {
     var collider = this.game.c.collider;
-    this.spikes.forEach((spike) => {
-      if (collider.isIntersecting(spike, this.collector)) {
-        this.game.over(this);
-      }
-    })
+    if (collider.isIntersecting(this.spike, this.collector)) {
+      this.game.over(this);
+    }
   }
 
   _spawnToken () {
@@ -204,15 +215,9 @@ class Board {
     });
   }
 
-  _spawnSpikes () {
-    this.spikes = range(2).map(() => {
-      return this._createSpike();
-    });
-  }
-
-  _createSpike () {
-    return this.game.c.entities.create(Spike, {
-      center: this._randomPosition(),
+  _spawnSpike (center) {
+    this.spike = this.game.c.entities.create(Spike, {
+      center: center || this._randomPosition(),
     });
   }
 
@@ -289,6 +294,89 @@ class Board {
         (this.size.y + space) +
         this.size.y / 2;
     return { x, y };
+  }
+};
+
+class SplitBoards {
+  constructor (game, oldBoard) {
+    this.game = game;
+    this._oldBoard = oldBoard;
+    this._generateDimensions();
+  }
+
+  _generateDimensions () {
+    let dimensions = new Map([
+      [Symbol.for("vertical"), this._verticalDimensions.bind(this)],
+      [Symbol.for("horizontal"), this._horizontalDimensions.bind(this)]
+    ]).get(this._splitDirection())();
+
+    this._createBoard(dimensions[0]);
+    this._createBoard(dimensions[1]);
+  }
+
+  _splitDirection () {
+    return this._oldBoard.size.x > this._oldBoard.size.y ?
+      Symbol.for("vertical") :
+      Symbol.for("horizontal");
+  }
+
+  _bodyCenter (dimensions, body) {
+    let collider = this.game.c.collider;
+    dimensions.boundingBox = collider.RECTANGLE;
+    if (collider.isIntersecting(dimensions, body)) {
+      return mathLib.copyPoint(body.center);
+    } else {
+      return this._mirrorPoint(body.center,
+                               this._oldBoard.center,
+                               this._splitDirection());
+    }
+  }
+
+  _mirrorPoint (point, mirrorPoint, direction) {
+    if (direction === Symbol.for("horizontal")) {
+      return { x: point.x, y: point.y + (mirrorPoint.y - point.y) * 2 };
+    } else {
+      return { x: point.x + (mirrorPoint.x - point.x) * 2, y: point.y };
+    };
+  }
+
+  _horizontalDimensions () {
+    let b = this._oldBoard;
+    let height = b.size.y / 2;
+    let size = { x: b.size.x, y: height };
+    return [{
+      size: mathLib.copyPoint(size),
+      center: { x: b.center.x, y: b.center.y - height / 2 }
+    }, {
+      size: mathLib.copyPoint(size),
+      center: { x: b.center.x, y: b.center.y + height / 2 }
+    }];
+  }
+
+  _createBoard (dimensions) {
+    return this.game.c.entities.create(Board, {
+      size: dimensions.size,
+      center: dimensions.center,
+      spikeCenter: this._bodyCenter(
+        dimensions, this._oldBoard.spike),
+      collectorCenter: this._bodyCenter(
+        dimensions, this._oldBoard.collector),
+      collectorVector: mathLib.copyPoint(
+        this._oldBoard.collector.vector)
+    });
+  }
+
+  _verticalDimensions() {
+    let b = this._oldBoard;
+    let width = b.size.x / 2;
+    let size = { x: width, y: b.size.y };
+    return [{
+      size: mathLib.copyPoint(size),
+      center: { x: b.center.x - width / 2, y: b.center.y }
+    }, {
+      size: mathLib.copyPoint(size),
+      center: { x: b.center.x + width / 2, y: b.center.y }
+    }];
   }
 };
 
