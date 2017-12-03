@@ -135,13 +135,23 @@ class Collector extends DrawableAsCircle(Base) {
 
   _maybeBounceOffWalls() {
     let collider = this.game.c.collider;
-    if (collider.isIntersecting(this, this.board.top()) ||
-        collider.isIntersecting(this, this.board.bottom())) {
+    if (collider.isIntersecting(this, this.board.top())) {
+      this.center.y = this.board.top().center.y + this.size.x / 2;
       this.vector.y = -this.vector.y;
     }
 
-    if (collider.isIntersecting(this, this.board.left()) ||
-        collider.isIntersecting(this, this.board.right())) {
+    if (collider.isIntersecting(this, this.board.bottom())) {
+      this.center.y = this.board.bottom().center.y - this.size.x / 2;
+      this.vector.y = -this.vector.y;
+    }
+
+    if (collider.isIntersecting(this, this.board.left())) {
+      this.center.x = this.board.left().center.x + this.size.x / 2;
+      this.vector.x = -this.vector.x;
+    }
+
+    if (collider.isIntersecting(this, this.board.right())) {
+      this.center.x = this.board.right().center.x - this.size.x / 2;
       this.vector.x = -this.vector.x;
     }
   }
