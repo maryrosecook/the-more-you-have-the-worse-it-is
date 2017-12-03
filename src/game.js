@@ -277,7 +277,7 @@ class Board {
   }
 
   _randomPosition () {
-    let inset = Token.radius();
+    let inset = Token.radius() * 2;
     return {
       x: this.left().center.x + inset +
         (this.right().center.x - this.left().center.x - inset * 2) *
