@@ -2,17 +2,22 @@ class Game {
   constructor (canvasId, width, height) {
     this.c = new Coquette(this, canvasId, width, height, "#fff");
 
-    range(9).forEach((i) => {
-      this._addBoard(i);
-    });
+    this.boardCount = 0;
+    this._addBoard();
   };
 
-  _addBoard(index) {
+  _addBoard() {
     const BOARD_COUNT = { x: 3, y: 3 };
     let board = this.c.entities.create(Board, {
-      index: index,
+      index: this.boardCount,
       boardCount: BOARD_COUNT
     });
+
+    this.boardCount++;
+  }
+
+  tokenCollected (board) {
+    this._addBoard();
   }
 };
 
@@ -90,13 +95,15 @@ class Collector extends DrawableAsCircle(Base) {
 };
 
 
-class Star extends DrawableAsCircle(Base) {
+class Token extends DrawableAsCircle(Base) {
   constructor (game, options) {
     super();
-    this.size = { x: 5, y: 5 };
+    this.size = { x: Token.radius(), y: Token.radius() };
     this.center = options.center;
     this.color = "#fc0";
   }
+
+  static radius () { return 7; }
 };
 
 class Board {
@@ -109,13 +116,31 @@ class Board {
     this.focused = false;
     this.zindex = -1;
 
-    this.game.c.entities.create(Collector, {
+    this.collector = this.game.c.entities.create(Collector, {
       board: this
     });
+
+    this._spawnToken();
   }
 
   update () {
     this._maybeUpdateFocused();
+    this._maybeCollectToken();
+  }
+
+  _maybeCollectToken () {
+    var collider = this.game.c.collider;
+    if (collider.isIntersecting(this.token, this.collector)) {
+      this.game.tokenCollected(this);
+      this.game.c.entities.destroy(this.token);
+      this._spawnToken();
+    }
+  }
+
+  _spawnToken () {
+    this.token = this.game.c.entities.create(Token, {
+      center: this._randomPosition(),
+    });
   }
 
   _maybeUpdateFocused () {
@@ -127,6 +152,18 @@ class Board {
     };
 
     this.focused = collider.isIntersecting(this, mouse);
+  }
+
+  _randomPosition () {
+    let inset = Token.radius();
+    return {
+      x: this.left().center.x + inset +
+        (this.right().center.x - this.left().center.x - inset * 2) *
+        Math.random(),
+      y: this.top().center.y + inset +
+        (this.bottom().center.y - this.top().center.y - inset * 2) *
+        Math.random()
+    };
   }
 
   draw (screen) {
