@@ -7,10 +7,16 @@ class Game {
                           windowSize.y,
                           "#fff");
     this.zindex = 2;
+    this.start();
+  };
+
+  start () {
+    let windowSize = this._windowSize();
     this.isOver = false;
     this.isShowingInstructions = true;
+    this.c.entities.create(Score);
     this._addBoard({ x: windowSize.x - 2, y: windowSize.y - 2 });
-  };
+  }
 
   update () {
     if (!this.isOver) {
@@ -36,12 +42,10 @@ class Game {
 
   _drawGameOver (screen) {
     let windowSize = this._windowSize();
-    screen.font = "30px Courier";
+    screen.font = "14px Courier";
     screen.fillStyle = "#f33";
     screen.textAlign = "center";
-    screen.fillText("GAME OVER",
-                    windowSize.x / 2,
-                    windowSize.y / 2 + 9);
+    screen.fillText("GAME OVER", windowSize.x - 47, 20);
   }
 
   _drawInstructions (screen) {
@@ -49,9 +53,10 @@ class Game {
     screen.font = "14px Courier";
     screen.fillStyle = "#000";
     screen.textAlign = "left";
-    screen.fillText("CLICK TO DIRECT BLACK DOT", 8, 20);
-    screen.fillText("COLLECT YELLOW DOTS TO SCORE POINTS FASTER", 8, 35);
-    screen.fillText("AVOID RED DOTS", 8, 50);
+    screen.fillText("CLICK TO DIRECT BLACK DOT", 8, 35);
+    screen.fillText("COLLECT YELLOW DOTS TO SCORE POINTS FASTER",
+                    8, 50);
+    screen.fillText("AVOID RED DOTS", 8, 65);
 
   }
 
@@ -280,7 +285,7 @@ class Board {
 
   draw (screen) {
     if (this.focused) {
-      screen.fillStyle = "#eee";
+      screen.fillStyle = "#fff";
     } else {
       screen.fillStyle = "#fff";
     }
@@ -464,6 +469,25 @@ class BoardSide {
 
     let size = { x: 1, y: board.size.y };
     return new BoardSide(center, size, boundingBox);
+  }
+}
+
+class Score {
+  constructor (game) {
+    this.game = game;
+    this._score = 0;
+  }
+
+  update () {
+    this._score += Math.pow(
+      2, this.game.c.entities.all(Board).length);
+  }
+
+  draw (screen) {
+    screen.font = "14px Courier";
+    screen.fillStyle = "#fa0";
+    screen.textAlign = "left";
+    screen.fillText(`SCORE: ${this._score}`, 8, 20);
   }
 }
 
