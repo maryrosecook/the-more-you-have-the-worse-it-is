@@ -19,6 +19,7 @@ class Game {
     this.c.entities.create(Score);
     this._addBoard({ x: windowSize.x - 2, y: windowSize.y - 2 });
     this._gameOverButton = this.c.entities.create(GameOverButton);
+    this.c.entities.create(Instructions);
   }
 
   update () {
@@ -41,30 +42,12 @@ class Game {
       this.c.collider.isIntersecting(mouse, this._gameOverButton);
   }
 
-  draw (screen) {
-    if (this.isShowingInstructions) {
-      this._drawInstructions(screen);
-    }
-  }
-
   _updateBodies () {
     this.c.entities.all().forEach((body) => {
       if (body.update !== undefined) {
         body.update();
       }
     });
-  }
-
-  _drawInstructions (screen) {
-    let viewSize = this.c.renderer.getViewSize();
-    screen.font = "14px Courier";
-    screen.fillStyle = "#000";
-    screen.textAlign = "left";
-    screen.fillText("CLICK TO DIRECT BLACK DOT", 8, 35);
-    screen.fillText("COLLECT YELLOW DOTS TO SCORE POINTS FASTER",
-                    8, 50);
-    screen.fillText("AVOID RED DOTS", 8, 65);
-
   }
 
   _hideInstructions () {
@@ -511,10 +494,9 @@ class Score {
 class GameOverButton {
   constructor(game) {
     this.game = game;
-    let windowSize = this.game.c.renderer.getViewSize();
     this.size = { x: 310, y: 20 };
     this.center = {
-      x: windowSize.x - this.size.x / 2,
+      x: this.game.c.renderer.getViewSize().x - this.size.x / 2,
       y: this.size.y
     };
     this.zindex = 2;
@@ -531,6 +513,26 @@ class GameOverButton {
                       this.center.y);
     }
   }
-}
+};
+
+class Instructions {
+  constructor(game) {
+    this.game = game;
+    this.zindex = 2;
+  }
+
+  draw (screen) {
+    if (this.game.c.entities.all(Board).length === 1) {
+      let viewSize = this.game.c.renderer.getViewSize();
+      screen.font = "14px Courier";
+      screen.fillStyle = "#000";
+      screen.textAlign = "left";
+      screen.fillText("CLICK TO DIRECT BLACK DOT", 8, 35);
+      screen.fillText("COLLECT YELLOW DOTS TO SCORE POINTS FASTER",
+                      8, 50);
+      screen.fillText("AVOID RED DOTS", 8, 65);
+    }
+  }
+};
 
 const range = n => Array.from({length: n}, (value, key) => key);
