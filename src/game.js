@@ -35,7 +35,7 @@ class Game {
   }
 
   _drawGameOver (screen) {
-    var windowSize = this._windowSize();
+    let windowSize = this._windowSize();
     screen.font = "30px Courier";
     screen.fillStyle = "#f33";
     screen.textAlign = "center";
@@ -45,7 +45,7 @@ class Game {
   }
 
   _drawInstructions (screen) {
-    var viewSize = this.c.renderer.getViewSize();
+    let viewSize = this.c.renderer.getViewSize();
     screen.font = "14px Courier";
     screen.fillStyle = "#000";
     screen.textAlign = "left";
@@ -78,7 +78,7 @@ class Game {
 
 class Base {};
 
-var DrawableAsCircle = (Base) => class extends Base {
+let DrawableAsCircle = (Base) => class extends Base {
   draw (screen) {
     screen.beginPath();
     screen.arc(this.center.x,
@@ -122,7 +122,7 @@ class Collector extends DrawableAsCircle(Base) {
   }
 
   _maybeBounceOffWalls() {
-    var collider = this.game.c.collider;
+    let collider = this.game.c.collider;
     if (collider.isIntersecting(this, this.board.top()) ||
         collider.isIntersecting(this, this.board.bottom())) {
       this.vector.y = -this.vector.y;
@@ -203,7 +203,7 @@ class Board {
   }
 
   _maybeCollectToken () {
-    var collider = this.game.c.collider;
+    let collider = this.game.c.collider;
     if (collider.isIntersecting(this.token, this.collector)) {
       this.split();
     }
@@ -229,7 +229,7 @@ class Board {
   }
 
   _maybeCollectorHitsSpike () {
-    var collider = this.game.c.collider;
+    let collider = this.game.c.collider;
     if (collider.isIntersecting(this.spike, this.collector)) {
       this.game.over(this);
     }
@@ -310,7 +310,7 @@ class Board {
   }
 
   _generateCenter(index, boardCount) {
-    var space = 0.5;
+    let space = 0.5;
     let x = 1 +
         index % boardCount.x *
         (this.size.x + space) +
