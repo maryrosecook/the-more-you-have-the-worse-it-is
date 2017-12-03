@@ -327,10 +327,10 @@ class SplitBoards {
   constructor (game, oldBoard) {
     this.game = game;
     this._oldBoard = oldBoard;
-    this._generateDimensions();
+    this._createBoards();
   }
 
-  _generateDimensions () {
+  _createBoards () {
     let dimensions = new Map([
       [Symbol.for("vertical"), this._verticalDimensions.bind(this)],
       [Symbol.for("horizontal"), this._horizontalDimensions.bind(this)]
