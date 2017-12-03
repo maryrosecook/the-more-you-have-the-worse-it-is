@@ -18,7 +18,9 @@ class Game {
   }
 
   draw (screen) {
-    if (this.isOver) {
+    if (!this.isOver) {
+      this._drawInstructions(screen);
+    } else {
       this._drawGameOver(screen);
     }
   }
@@ -39,6 +41,17 @@ class Game {
     screen.fillText("GAME OVER",
                     windowSize.x / 2,
                     windowSize.y / 2 + 9);
+  }
+
+  _drawInstructions (screen) {
+    var viewSize = this.c.renderer.getViewSize();
+    screen.font = "14px Courier";
+    screen.fillStyle = "#000";
+    screen.textAlign = "left";
+    screen.fillText("Click to direct black dot", 8, 20);
+    screen.fillText("Collect yellow dots to speed up point scoring", 8, 35);
+    screen.fillText("Avoid red dots", 8, 50);
+
   }
 
   _addBoard(size) {
