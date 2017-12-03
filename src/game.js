@@ -162,10 +162,7 @@ class Board {
     this.focused = false;
     this.zindex = -1;
 
-    this.collector = this.game.c.entities.create(Collector, {
-      board: this
-    });
-
+    this._spawnCollector();
     this._spawnToken();
     this._spawnSpikes();
   }
@@ -174,6 +171,12 @@ class Board {
     this._maybeUpdateFocused();
     this._maybeCollectToken();
     this._maybeCollectorHitsSpike();
+  }
+
+  _spawnCollector () {
+    this.collector = this.game.c.entities.create(Collector, {
+      board: this
+    });
   }
 
   _maybeCollectToken () {
