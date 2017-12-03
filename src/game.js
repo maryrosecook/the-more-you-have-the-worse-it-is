@@ -18,20 +18,31 @@ class Game {
     this.isShowingInstructions = true;
     this.c.entities.create(Score);
     this._addBoard({ x: windowSize.x - 2, y: windowSize.y - 2 });
+    this._gameOverButton = this.c.entities.create(GameOverButton);
   }
 
   update () {
     if (!this.isOver) {
       this._updateBodies();
-    } else if (this.c.inputter.isDown(this.c.inputter.LEFT_MOUSE)) {
+    } else if (this._restartButtonClicked()) {
       this.start();
     }
   }
 
+  _restartButtonClicked () {
+    let mouse = {
+      size:  { x: 1, y: 1 },
+      center: this.c.inputter.getMousePosition(),
+      boundingBox: this.c.collider.RECTANGLE,
+    };
+
+    return this.isOver &&
+      this.c.inputter.isDown(this.c.inputter.LEFT_MOUSE) &&
+      this.c.collider.isIntersecting(mouse, this._gameOverButton);
+  }
+
   draw (screen) {
-    if (this.isOver) {
-      this._drawGameOver(screen);
-    } else if (this.isShowingInstructions) {
+    if (this.isShowingInstructions) {
       this._drawInstructions(screen);
     }
   }
@@ -42,15 +53,6 @@ class Game {
         body.update();
       }
     });
-  }
-
-  _drawGameOver (screen) {
-    let windowSize = this._windowSize();
-    screen.font = "14px Courier";
-    screen.fillStyle = "#f33";
-    screen.textAlign = "center";
-    screen.fillText("GAME OVER, CLICK TO PLAY AGAIN",
-                    windowSize.x - 135, 20);
   }
 
   _drawInstructions (screen) {
@@ -493,6 +495,35 @@ class Score {
     screen.fillStyle = "#fa0";
     screen.textAlign = "left";
     screen.fillText(`SCORE: ${this._score}`, 8, 20);
+  }
+}
+
+class GameOverButton {
+  constructor(game) {
+    this.game = game;
+    let windowSize = this.game.c.renderer.getViewSize();
+    this.size = { x: 310, y: 20 };
+    this.center = {
+      x: windowSize.x - this.size.x / 2,
+      y: this.size.y
+    };
+    this.zindex = 2;
+    this.boundingBox = this.game.c.collider.RECTANGLE;
+  }
+
+  draw (screen) {
+    if (this.game.isOver) {
+      screen.strokeRect(this.center.x - this.size.x / 2,
+                        this.center.y - this.size.y / 2,
+                        this.size.x,
+                       this.size.y)
+      screen.font = "14px Courier";
+      screen.fillStyle = "#f33";
+      screen.textAlign = "center";
+      screen.fillText("GAME OVER, CLICK HERE TO PLAY AGAIN",
+                      this.center.x,
+                      this.center.y);
+    }
   }
 }
 
