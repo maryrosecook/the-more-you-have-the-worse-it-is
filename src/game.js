@@ -184,14 +184,21 @@ class Board {
 
     this._spawnCollector(options.collectorCenter,
                          options.collectorVector);
-    this._spawnToken();
     this._spawnSpike(options.spikeCenter);
+
+    if (options.shouldSpawnToken !== false) {
+      this._spawnToken();
+    }
   }
 
   update () {
     this._maybeUpdateFocused();
     this._maybeCollectToken();
     this._maybeCollectorHitsSpike();
+  }
+
+  area () {
+    return this.size.x * this.size.y;
   }
 
   _spawnCollector (center, vector) {
@@ -204,7 +211,8 @@ class Board {
 
   _maybeCollectToken () {
     let collider = this.game.c.collider;
-    if (collider.isIntersecting(this.token, this.collector)) {
+    if (this.token &&
+        collider.isIntersecting(this.token, this.collector)) {
       this.split();
     }
   }
@@ -383,6 +391,7 @@ class SplitBoards {
     return this.game.c.entities.create(Board, {
       size: dimensions.size,
       center: dimensions.center,
+      shouldSpawnToken: this._isPossibleToSplitNewBoards(),
       spikeCenter: this._bodyCenter(
         dimensions, this._oldBoard.spike),
       collectorCenter: this._bodyCenter(
@@ -390,6 +399,10 @@ class SplitBoards {
       collectorVector: mathLib.copyPoint(
         this._oldBoard.collector.vector)
     });
+  }
+
+  _isPossibleToSplitNewBoards () {
+    return this._oldBoard.area() > 50000;
   }
 
   _verticalDimensions() {
