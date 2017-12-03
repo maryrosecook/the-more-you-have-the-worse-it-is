@@ -55,7 +55,6 @@ class Game {
   }
 
   _addBoard(size) {
-    const BOARD_COUNT = { x: 3, y: 3 };
     let board = this.c.entities.create(Board, {
       size: size,
       center: { x: size.x / 2 + 1, y: size.y / 2 + 1 }
