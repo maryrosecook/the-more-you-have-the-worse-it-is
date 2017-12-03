@@ -1,6 +1,7 @@
 class Game {
   constructor (canvasId, width, height) {
     this.c = new Coquette(this, canvasId, width, height, "#fff");
+    this.zindex = 2;
 
     this.isOver = false;
     this.boardCount = 0;
