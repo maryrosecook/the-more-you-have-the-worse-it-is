@@ -2,9 +2,40 @@ class Game {
   constructor (canvasId, width, height) {
     this.c = new Coquette(this, canvasId, width, height, "#fff");
 
+    this.isOver = false;
     this.boardCount = 0;
     this._addBoard();
   };
+
+  update () {
+    if (!this.isOver) {
+      this._updateBodies();
+    }
+  }
+
+  draw (screen) {
+    if (this.isOver) {
+      this._drawGameOver(screen);
+    }
+  }
+
+  _updateBodies () {
+    this.c.entities.all().forEach((body) => {
+      if (body.update !== undefined) {
+        body.update();
+      }
+    });
+  }
+
+  _drawGameOver (screen) {
+    var viewSize = this.c.renderer.getViewSize();
+    screen.font = "30px Courier";
+    screen.fillStyle = "#f33";
+    screen.textAlign = "center";
+    screen.fillText("GAME OVER",
+                    viewSize.x / 2,
+                    viewSize.y / 2);
+  }
 
   _addBoard() {
     const BOARD_COUNT = { x: 3, y: 3 };
@@ -19,11 +50,15 @@ class Game {
   tokenCollected (board) {
     this._addBoard();
   }
+
+  over () {
+    this.isOver = true;
+  }
 };
 
 class Base {};
 
-var DrawableAsCircle = Base => class extends Base {
+var DrawableAsCircle = (Base) => class extends Base {
   draw (screen) {
     screen.beginPath();
     screen.arc(this.center.x,
@@ -106,6 +141,17 @@ class Token extends DrawableAsCircle(Base) {
   static radius () { return 7; }
 };
 
+class Spike extends DrawableAsCircle(Base) {
+  constructor (game, options) {
+    super();
+    this.size = { x: Spike.radius(), y: Spike.radius() };
+    this.center = options.center;
+    this.color = "#f66";
+  }
+
+  static radius () { return 7; }
+};
+
 class Board {
   constructor (game, options) {
     this.game = game;
@@ -121,11 +167,13 @@ class Board {
     });
 
     this._spawnToken();
+    this._spawnSpikes();
   }
 
   update () {
     this._maybeUpdateFocused();
     this._maybeCollectToken();
+    this._maybeCollectorHitsSpike();
   }
 
   _maybeCollectToken () {
@@ -137,8 +185,29 @@ class Board {
     }
   }
 
+  _maybeCollectorHitsSpike () {
+    var collider = this.game.c.collider;
+    this.spikes.forEach((spike) => {
+      if (collider.isIntersecting(spike, this.collector)) {
+        this.game.over(this);
+      }
+    })
+  }
+
   _spawnToken () {
     this.token = this.game.c.entities.create(Token, {
+      center: this._randomPosition(),
+    });
+  }
+
+  _spawnSpikes () {
+    this.spikes = range(2).map(() => {
+      return this._createSpike();
+    });
+  }
+
+  _createSpike () {
+    return this.game.c.entities.create(Spike, {
       center: this._randomPosition(),
     });
   }

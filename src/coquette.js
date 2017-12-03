@@ -868,9 +868,9 @@
     update: function(interval) {
       var entities = this.all();
       for (var i = 0, len = entities.length; i < len; i++) {
-        if (entities[i].update !== undefined) {
-          entities[i].update(interval);
-        }
+        // if (entities[i].update !== undefined) {
+        //   entities[i].update(interval);
+        // }
       }
     },
 
