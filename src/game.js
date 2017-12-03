@@ -12,6 +12,8 @@ class Game {
 
   start () {
     let windowSize = this._windowSize();
+    this.c.entities.all()
+      .forEach(entity => this.c.entities.destroy(entity));
     this.isOver = false;
     this.isShowingInstructions = true;
     this.c.entities.create(Score);
@@ -21,6 +23,8 @@ class Game {
   update () {
     if (!this.isOver) {
       this._updateBodies();
+    } else if (this.c.inputter.isDown(this.c.inputter.LEFT_MOUSE)) {
+      this.start();
     }
   }
 
@@ -45,7 +49,8 @@ class Game {
     screen.font = "14px Courier";
     screen.fillStyle = "#f33";
     screen.textAlign = "center";
-    screen.fillText("GAME OVER", windowSize.x - 47, 20);
+    screen.fillText("GAME OVER, CLICK TO PLAY AGAIN",
+                    windowSize.x - 135, 20);
   }
 
   _drawInstructions (screen) {
