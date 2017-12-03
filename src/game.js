@@ -95,7 +95,7 @@ class Collector extends DrawableAsCircle(Base) {
     this.boundingBox = this.game.c.collider.CIRCLE;
     this.center = options.center ||
       mathLib.copyPoint(options.board.center);
-    this.size = { x: 7, y: 7 };
+    this.size = { x: 10, y: 10 };
     this.vector = options.vector || mathLib.unitVector({
       x: Math.random() - 0.5,
       y: Math.random() - 0.5
@@ -150,10 +150,10 @@ class Token extends DrawableAsCircle(Base) {
     super();
     this.size = { x: Token.radius(), y: Token.radius() };
     this.center = options.center;
-    this.color = "#fc0";
+    this.color = "#fa0";
   }
 
-  static radius () { return 7; }
+  static radius () { return 10; }
 };
 
 class Spike extends DrawableAsCircle(Base) {
@@ -164,7 +164,7 @@ class Spike extends DrawableAsCircle(Base) {
     this.color = "#f66";
   }
 
-  static radius () { return 7; }
+  static radius () { return 10; }
 };
 
 class Board {
